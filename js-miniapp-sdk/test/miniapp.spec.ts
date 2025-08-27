@@ -75,8 +75,10 @@ window.MiniAppBridge = {
   isEsimSupported: sandbox.stub(),
   setupAndInstallEsim: sandbox.stub(),
   forceInternalWebView: sandbox.stub(),
-  getPermissionStatus: sandbox.stub(),
   userProfileManager,
+  utilityManager: {
+    getPermissionStatus: sandbox.stub(),
+  },
 };
 
 const miniApp = new MiniApp();
@@ -235,10 +237,12 @@ describe('requestCustomPermissions', () => {
 
 describe('requestPermissionStatus', () => {
   it('should request provided permissions from the Mini App Bridge', () => {
-    window.MiniAppBridge.getPermissionStatus.resolves(PermissionStatus.GRANTED);
+    window.MiniAppBridge.utilityManager.getPermissionStatus.resolves(
+      PermissionStatus.GRANTED
+    );
 
     return expect(
-      miniApp.requestPermissionStatus(PermissionName.CAMERA)
+      miniApp.getPermissionStatus(PermissionName.CAMERA)
     ).to.eventually.deep.equal(PermissionStatus.GRANTED);
   });
 });
