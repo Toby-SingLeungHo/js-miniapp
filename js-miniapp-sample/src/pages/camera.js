@@ -4,6 +4,8 @@ import { Card, Grid, Button, makeStyles } from '@material-ui/core';
 import { sendAnalytics } from './helper';
 import { MAAnalyticsActionType, MAAnalyticsEventType } from 'js-miniapp-sdk';
 
+import Webcam from 'react-webcam';
+
 const useStyles = makeStyles((theme) => ({
   root: {
     height: 'auto',
@@ -12,7 +14,6 @@ const useStyles = makeStyles((theme) => ({
   },
   grid: {
     display: 'flex',
-    height: '20%',
     flexDirection: 'column',
     justifyContent: 'center',
     padding: '20px',
@@ -31,7 +32,6 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 'bold',
   },
   contentSection: {
-    height: '30%',
     padding: '10px',
   },
   label: {
@@ -64,8 +64,16 @@ const Camera = () => {
 
   const [image, setImage] = useState(null);
   const [cameraPermission, setCameraPermission] = useState('Checking...');
+  const [cameraFacing, setCameraFacing] = useState('user');
   const [microphonePermission, setMicrophonePermission] =
     useState('Checking...');
+
+  const videoDefaultConstraints = {
+    width: 640,
+    height: 480,
+    facingMode: cameraFacing,
+  };
+  const [cameraSettings, setCameraSettings] = useState(videoDefaultConstraints);
 
   const cameraRef = useRef(null);
 
@@ -122,6 +130,51 @@ const Camera = () => {
     cameraRef.current.click();
   };
 
+  const loadCamera = () => {
+    const buttons = [
+      <Button
+        key="frontCamera"
+        variant="contained"
+        color="primary"
+        onClick={() => {
+          console.log('Set Camera to Front');
+          setCameraFacing('user');
+        }}
+      >
+        Front
+      </Button>,
+      <Button
+        key="backCamera"
+        variant="contained"
+        color="primary"
+        onClick={() => {
+          console.log('Set Camera to Back');
+          setCameraFacing('environment');
+        }}
+      >
+        Back
+      </Button>,
+    ];
+    if (cameraPermission === 'granted') {
+      const userMedia = navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      console.log(`Facing Mode: ${userMedia?.facingMode}`);
+      const facingMode = userMedia?.facingMode;
+      return (
+        <div className={classes.contentSection}>
+          {facingMode && facingMode.length > 1 ? buttons : null}
+          <Webcam
+            audio={false}
+            screenshotFormat="image/jpeg"
+            videoConstraints={cameraSettings}
+          ></Webcam>
+          <br />
+        </div>
+      );
+    } else {
+      return;
+    }
+  };
+
   return (
     <Card className={classes.root}>
       <Card id="imageBox" className={classes.imageBox} hidden={image == null}>
@@ -133,32 +186,7 @@ const Camera = () => {
         />
       </Card>
       <Grid className={classes.grid} align="center">
-        <div className={classes.contentSection}>
-          <label className={classes.label}>Pick Image</label>
-          <input
-            id="cameraBack"
-            type="file"
-            accept=".jpg,.jpeg,.png,.svg,.gif"
-            onChange={setFiles}
-            data-testid="file-input-image-back"
-            capture="environment"
-            ref={cameraRef}
-            style={{ display: 'none' }} // Hide the input element
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleFileInputClick}
-          >
-            Open Camera
-          </Button>
-        </div>
-        <div className={classes.contentSection}>
-          <Button variant="contained" color="primary" onClick={() => clear()}>
-            Clear
-          </Button>
-        </div>
-        <br />
+        {loadCamera()}
         <div className={classes.contentSection}>
           <Button
             variant="contained"
