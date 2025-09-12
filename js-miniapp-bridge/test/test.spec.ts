@@ -30,7 +30,10 @@ import {
   EsimConfig,
   PermissionName,
   PermissionStatus,
+  CookieInfo,
 } from '../src';
+import { LoadHTMLStringOptions } from '../src/types/browser-options';
+import { InternalBrowserErrorType } from '../src/types/error-types/internal-browser-error';
 
 /* tslint:disable:no-any */
 const window: any = {
@@ -1258,6 +1261,103 @@ describe('launchAppSettings', () => {
   });
 });
 
+describe('getAllCookies', () => {
+  it('will call the platform executor', () => {
+    const bridge = new Bridge.MiniAppBridge(mockExecutor);
+
+    bridge.getAllCookies().catch(handleError);
+
+    sinon.assert.calledWith(mockExecutor.exec, 'getAllCookies');
+  });
+
+  it('will parse the Permission JSON response', () => {
+    const mock: CookieInfo[] = [
+      {
+        name: 'test',
+        value: '123',
+      },
+    ];
+    const bridge = new Bridge.MiniAppBridge(mockExecutor);
+    mockExecutor.exec.callsArgWith(2, JSON.stringify(mock));
+
+    const expected: CookieInfo[] = [
+      {
+        name: 'test',
+        value: '123',
+      },
+    ];
+    return expect(bridge.getAllCookies()).to.eventually.deep.equal(expected);
+  });
+
+  it('will fail to parse the Permission JSON response', () => {
+    const bridge = new Bridge.MiniAppBridge(mockExecutor);
+    mockExecutor.exec.callsArgWith(2, `123`);
+    return expect(bridge.getAllCookies()).to.eventually.be.rejectedWith();
+  });
+
+  it('will parse the Error response', () => {
+    const bridge = new Bridge.MiniAppBridge(mockExecutor);
+    mockExecutor.exec.callsArgWith(3, '{ "message": "Gallery not found" }');
+
+    return expect(bridge.getAllCookies()).to.eventually.be.rejected;
+  });
+});
+
+describe('getCookies', () => {
+  it('will call the platform executor', () => {
+    const bridge = new Bridge.MiniAppBridge(mockExecutor);
+
+    bridge.getCookies(['cookie1', 'cookie2']).catch(handleError);
+
+    sinon.assert.calledWith(mockExecutor.exec, 'getCookies');
+  });
+
+  it('will parse the Permission JSON response', () => {
+    const mock: CookieInfo[] = [
+      {
+        name: 'cookie1',
+        value: '123',
+      },
+    ];
+    const bridge = new Bridge.MiniAppBridge(mockExecutor);
+    mockExecutor.exec.callsArgWith(2, JSON.stringify(mock));
+
+    const expected: CookieInfo[] = [
+      {
+        name: 'cookie1',
+        value: '123',
+      },
+    ];
+    return expect(
+      bridge.getCookies(['cookie1', 'cookie2'])
+    ).to.eventually.deep.equal(expected);
+  });
+
+  it('will fail to parse the Permission JSON response', () => {
+    const bridge = new Bridge.MiniAppBridge(mockExecutor);
+    mockExecutor.exec.callsArgWith(2, `123`);
+    return expect(
+      bridge.getCookies(['cookie1', 'cookie2'])
+    ).to.eventually.be.rejectedWith();
+  });
+
+  it('will fail to parse the Permission JSON response not same cookieInfo schema', () => {
+    const bridge = new Bridge.MiniAppBridge(mockExecutor);
+    mockExecutor.exec.callsArgWith(2, `[{'test':'whee'}]`);
+    return expect(
+      bridge.getCookies(['cookie1', 'cookie2'])
+    ).to.eventually.be.rejectedWith();
+  });
+
+  it('will parse the Error response', () => {
+    const bridge = new Bridge.MiniAppBridge(mockExecutor);
+    mockExecutor.exec.callsArgWith(3, '{ "message": "Gallery not found" }');
+
+    return expect(bridge.getCookies(['cookie1', 'cookie2'])).to.eventually.be
+      .rejected;
+  });
+});
+
 interface CreateCallbackParams {
   onSuccess?: (success: any) => any;
   onError?: (error: string) => any;
@@ -1326,6 +1426,33 @@ describe('launchAppUsingPackageName', () => {
     mockExecutor.exec.callsArgWith(3, '{ "message": "package error" }');
 
     return expect(bridge.launchAppUsingPackageName('com.example.app')).to
+      .eventually.be.rejected;
+  });
+});
+
+describe('loadUsingHTMLString', () => {
+  const params = {
+    htmlString: '<html><body>Hello World</body></html>',
+    callbackUrl: 'https://localhost:3000/index.html',
+    baseUrl: 'https://localhost',
+  } as LoadHTMLStringOptions;
+
+  it('will call the platform executor', () => {
+    const bridge = new Bridge.MiniAppBridge(mockExecutor);
+
+    bridge.browserManager.loadUsingHTMLString(params).catch(handleError);
+
+    sinon.assert.calledWith(mockExecutor.exec, 'loadUsingHTMLString');
+  });
+
+  it('will parse the Error response', () => {
+    const bridge = new Bridge.MiniAppBridge(mockExecutor);
+    mockExecutor.exec.callsArgWith(
+      3,
+      `{"type":"${InternalBrowserErrorType.HTML_STRING_TOO_LARGE}","message":"Load Using HTML String is too long"}`
+    );
+
+    return expect(bridge.browserManager.loadUsingHTMLString(params)).to
       .eventually.be.rejected;
   });
 });
