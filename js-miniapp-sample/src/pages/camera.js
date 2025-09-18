@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { Card, Grid, Button, makeStyles } from '@material-ui/core';
 import { sendAnalytics } from './helper';
@@ -15,6 +15,11 @@ const useStyles = makeStyles((theme) => ({
   grid: {
     display: 'flex',
     flexDirection: 'column',
+    justifyContent: 'center',
+    padding: '20px',
+  },
+  buttons: {
+    display: 'flex',
     justifyContent: 'center',
     padding: '20px',
   },
@@ -49,33 +54,37 @@ const useStyles = makeStyles((theme) => ({
     objectFit: 'contain',
   },
 }));
+const speechRecognition =
+  window.SpeechRecognition || window.webkitSpeechRecognition;
+const recognition = speechRecognition && new speechRecognition();
+if (recognition) {
+  recognition.lang = 'en-US';
+  recognition.interimResults = false;
 
-const recognition = new (window.SpeechRecognition ||
-  window.webkitSpeechRecognition)();
-recognition.lang = 'en-US';
-recognition.interimResults = false;
-
-recognition.onresult = (event) => {
-  document.getElementById('output').innerText = event.results[0][0].transcript;
-};
+  recognition.onresult = (event) => {
+    document.getElementById('output').innerText =
+      event.results[0][0].transcript;
+  };
+}
 
 const Camera = () => {
-  const classes = useStyles();
+  const [image, setImage] = useState();
+  const [videoConstraints, setVideoConstraints] = useState();
+  const [audioConstraints, setAudioConstraints] = useState();
 
-  const [image, setImage] = useState(null);
   const [cameraPermission, setCameraPermission] = useState('Checking...');
-  const [cameraFacing, setCameraFacing] = useState('user');
   const [microphonePermission, setMicrophonePermission] =
     useState('Checking...');
+  const [isMuted, setIsMuted] = useState(true);
+  const [cameraIndex, setViewingCamera] = useState('user');
+  const [listOfCameraDevices, setListOfCameraDevices] = useState([]);
 
-  const videoDefaultConstraints = {
-    width: 640,
-    height: 480,
-    facingMode: cameraFacing,
-  };
-  const [cameraSettings, setCameraSettings] = useState(videoDefaultConstraints);
-
-  const cameraRef = useRef(null);
+  const webcamRef = React.useRef(null);
+  const capture = React.useCallback(() => {
+    const imageSrc = webcamRef.current.getScreenshot();
+    setImage(imageSrc);
+  }, [webcamRef]);
+  const classes = useStyles();
 
   useEffect(() => {
     sendAnalytics(
@@ -87,106 +96,162 @@ const Camera = () => {
       ''
     );
   });
-  const setFiles = (e) => {
-    const files = e.target.files;
-    if (!files && files.length > 0) {
-      return;
-    }
-    setImage(URL.createObjectURL(e.target.files[0]));
-  };
 
-  function clear() {
-    setImage(null);
-    if (cameraRef.current !== null) {
-      cameraRef.current.value = '';
-    }
-  }
+  const requestPermission = React.useCallback(
+    async (type) => {
+      let devices;
+      if(navigator.mediaDevices.enumerateDevices){
+        devices = await navigator.mediaDevices.enumerateDevices();
+        devices = devices.filter((val) => val.kind === 'videoinput');
+        setListOfCameraDevices(devices);
+      }
 
-  function updateStatus(type, status) {
+      let status = 'denied';
+
+      const _videoConstraints = {
+        width: 640,
+        height: 480,
+      };
+      if (devices?.length>0) setViewingCamera(devices[0].deviceId);
+
+      if (cameraIndex === 'user' || cameraIndex === 'environment')
+        _videoConstraints.facingMode = cameraIndex;
+      else _videoConstraints.deviceId = cameraIndex;
+
+      try {
+        const newConstraints = {};
+        newConstraints.audio =
+          microphonePermission === 'granted' || type === 'microphone'
+            ? { echoCancellation: true }
+            : false;
+        newConstraints.video =
+          cameraPermission === 'granted' || type === 'camera'
+            ? _videoConstraints
+            : false;
+        await navigator.mediaDevices.getUserMedia(newConstraints);
+        status = 'granted';
+        setVideoConstraints(newConstraints.video);
+        setAudioConstraints(newConstraints.audio);
+      } catch (error) {
+        alert(`getUserMedia::error -> ${error}`);
+        status = 'denied';
+        setVideoConstraints(undefined);
+        setAudioConstraints(undefined);
+      }
+      updateStatus(type, status);
+    },
+    [cameraIndex, microphonePermission, cameraPermission]
+  );
+
+  useEffect(() => {
+    if (cameraPermission !== 'Checking...' && cameraPermission !== 'denied') {
+      console.log('requestPermission requested');
+      requestPermission('camera').finally(() => {
+        console.log('requestPermission done');
+      });
+    }
+  }, [cameraIndex, cameraPermission, microphonePermission, requestPermission]);
+
+  const updateStatus = function (type, status) {
     if (type === 'microphone') setMicrophonePermission(status);
     if (type === 'camera') setCameraPermission(status);
-  }
-
-  async function requestPermission(type) {
-    try {
-      console.log('[Leo]: requestPermission');
-      const constraints =
-        type === 'microphone' ? { audio: true } : { video: true };
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      console.log(`[Leo]: ${type} permission granted.`);
-      updateStatus(type, 'granted');
-      stream.getTracks().forEach((track) => track.stop()); // Stop stream after requesting
-    } catch (error) {
-      console.error(`[Leo]: ${type} permission denied:`, error);
-      updateStatus(type, 'denied');
-    }
-  }
-
-  const handleFileInputClick = async () => {
-    if (cameraPermission === 'denied') {
-      alert('Please go to settings and enable camera permission.');
-      return;
-    }
-    cameraRef.current.click();
   };
 
-  const loadCamera = () => {
-    const buttons = [
-      <Button
-        key="frontCamera"
-        variant="contained"
-        color="primary"
-        onClick={() => {
-          console.log('Set Camera to Front');
-          setCameraFacing('user');
-        }}
-      >
-        Front
-      </Button>,
-      <Button
-        key="backCamera"
-        variant="contained"
-        color="primary"
-        onClick={() => {
-          console.log('Set Camera to Back');
-          setCameraFacing('environment');
-        }}
-      >
-        Back
-      </Button>,
-    ];
-    if (cameraPermission === 'granted') {
-      const userMedia = navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-      console.log(`Facing Mode: ${userMedia?.facingMode}`);
-      const facingMode = userMedia?.facingMode;
-      return (
-        <div className={classes.contentSection}>
-          {facingMode && facingMode.length > 1 ? buttons : null}
-          <Webcam
-            audio={false}
-            screenshotFormat="image/jpeg"
-            videoConstraints={cameraSettings}
-          ></Webcam>
-          <br />
-        </div>
-      );
-    } else {
-      return;
-    }
+  const switchMute = () => {
+    setIsMuted(!isMuted);
+    setVideoConstraints(undefined);
+    setAudioConstraints(undefined);
+  };
+
+  const switchCamera = (dev) => {
+    setViewingCamera(
+      dev ? dev.deviceId : cameraIndex === 'user' ? 'environment' : 'user'
+    );
+    setListOfCameraDevices([]);
+    setVideoConstraints(undefined);
+    setAudioConstraints(undefined);
+    setCameraPermission('Changed');
+  };
+
+  const onUserMedia = (stream) => {
+    console.log(`onUserMedia::${stream}`);
+  };
+
+  const onUserMediaError = (error) => {
+    console.error(`onUserMediaError::error -> ${error}`);
   };
 
   return (
     <Card className={classes.root}>
-      <Card id="imageBox" className={classes.imageBox} hidden={image == null}>
-        <img
-          id="imageBoxContent"
-          alt="CapturedPicture"
-          className={classes.imageBoxContent}
-          src={image}
-        />
-      </Card>
       <Grid className={classes.grid} align="center">
-        {loadCamera()}
+        <div className={classes.contentSection}>
+          {/* <Grid className={classes.buttons}>{buttons}</Grid> */}
+          {cameraPermission === 'granted'
+            ? [
+                listOfCameraDevices.map((val) => [
+                  <Button
+                    key={val.deviceId}
+                    variant="contained"
+                    color="primary"
+                    disabled={val.deviceId === cameraIndex}
+                    onClick={() => switchCamera(val)}
+                  >
+                    {val.label}
+                  </Button>,
+                  <>&nbsp;</>,
+                ]),
+                <br />,
+                <Webcam
+                  mirrored={true}
+                  audio={!isMuted}
+                  ref={webcamRef}
+                  screenshotFormat="image/jpeg"
+                  videoConstraints={videoConstraints}
+                  audioConstraints={audioConstraints}
+                  onUserMedia={onUserMedia}
+                  onUserMediaError={onUserMediaError}
+                  width="100%"
+                  screenshotQuality="1"
+                ></Webcam>,
+                <br />,
+                microphonePermission === 'granted'
+                  ? [
+                      <Button
+                        key="muteButton"
+                        variant="contained"
+                        color="primary"
+                        onClick={switchMute}
+                      >
+                        {isMuted ? 'Unmute' : 'Mute'}
+                      </Button>,
+                      <br />,
+                    ]
+                  : null,
+                <br />,
+                <Button
+                  key="screenshotButton"
+                  variant="contained"
+                  color="primary"
+                  onClick={capture}
+                >
+                  Get ScreenShot
+                </Button>,
+                <br />,
+              ]
+            : null}
+          <div
+            id="imageBox"
+            className={classes.imageBox}
+            hidden={image == null}
+          >
+            <img
+              id="imageBoxContent"
+              alt="CapturedPicture"
+              className={classes.imageBoxContent}
+              src={image}
+            />
+          </div>
+        </div>
         <div className={classes.contentSection}>
           <Button
             variant="contained"
