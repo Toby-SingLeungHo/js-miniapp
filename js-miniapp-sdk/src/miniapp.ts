@@ -120,6 +120,8 @@ interface MiniAppFeatures {
    * Mini App can choose whether to display Close confirmation alert dialog when mini app is closed
    */
   setCloseAlert(alertInfo: CloseAlertInfo): Promise<string>;
+
+  invokeLinkInterface(action: string, param: object | undefined)
 }
 
 /**
@@ -307,5 +309,9 @@ export class MiniApp implements MiniAppFeatures, Ad, Platform {
 
   getPermissionStatus(name: PermissionName): Promise<string> {
     return getBridge().utilityManager.getPermissionStatus(name);
+  }
+
+  invokeLinkInterface(name: string, param: object | undefined): Promise<string> {
+    return getBridge().invokeLinkInterface(name, param);
   }
 }

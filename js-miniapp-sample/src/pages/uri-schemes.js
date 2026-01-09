@@ -75,6 +75,22 @@ const deepLinkStyle = makeStyles((theme) => ({
   },
 }));
 
+function sendDatatoMockSSP() {
+  console.log('Opening IC SDK and connecting to MiniApp...', 'info');
+  MiniApp.invokeLinkInterface('openIcSdk', {
+      status: 'go',
+      message: 'ssp received data'
+  })
+  .then(response => {
+      console.log(' Success!', 'success');
+      console.log(' ' + response.data, 'Received Data from SSP');
+      console.log(' ' + response.data.status, 'received');
+  })
+  .catch(error => {
+      console.log(' Error: ' + error.error, 'error');
+  });
+}
+
 const UriSchemes = () => {
   const EXTERNAL_WEBVIEW_URL =
     'https://htmlpreview.github.io/?https://raw.githubusercontent.com/rakutentech/js-miniapp/master/js-miniapp-sample/external-webview/index.html';
@@ -164,6 +180,10 @@ const UriSchemes = () => {
   }
 
   function openInternalBrowser(url: string) {
+    setTimeout(()=>{
+      console.log('After 10 seconds calling sendDatatoMockSSP')
+      sendDatatoMockSSP();
+    },10000)
     MiniApp.miniappUtils
       .launchInternalBrowser(url)
       .then((response) => {
@@ -181,6 +201,10 @@ const UriSchemes = () => {
     audience?: string,
     scopes?: string[]
   ) {
+    setTimeout(()=>{
+      console.log('After 10 seconds calling sendDatatoMockSSP')
+      sendDatatoMockSSP();
+    },10000)
     let httpBody;
     setInternalPostError('');
     try {
@@ -242,6 +266,21 @@ const UriSchemes = () => {
 
   return (
     <div className={classes.scrollable}>
+      <GreyCard className={classes.card}>
+        <CardContent className={classes.content}>
+          Send Data To Mock SSP
+        </CardContent>
+        <CardActions className={deeplinkClass.actions}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={sendDatatoMockSSP}
+          >
+            sendDatatoMockSSP
+          </Button>
+        </CardActions>
+      </GreyCard>
+      <br />
       <GreyCard className={classes.card}>
         <CardContent className={classes.content}>
           Launch URL in External Browser

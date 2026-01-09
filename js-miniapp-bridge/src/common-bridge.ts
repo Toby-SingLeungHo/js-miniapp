@@ -1162,6 +1162,19 @@ export class MiniAppBridge {
   isAppInstalledInDevice(packageNameOrUrl: string) {
     return this.utilityManager.isAppInstalledInDevice(packageNameOrUrl);
   }
+
+  invokeLinkInterface(action:string, params:object | undefined): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      return this.executor.exec(
+        'invokeLinkInterface',
+        {action, params},
+        response => {
+          resolve(JSON.parse(response) as string[]);
+        },
+        error => reject(parseMiniAppError(error))
+      );
+    });
+  }
 }
 
 /**
