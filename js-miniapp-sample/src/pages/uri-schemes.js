@@ -75,20 +75,26 @@ const deepLinkStyle = makeStyles((theme) => ({
   },
 }));
 
-function sendDatatoMockSSP() {
-  console.log('Opening IC SDK and connecting to MiniApp...', 'info');
-  MiniApp.invokeLinkInterface('openIcSdk', {
-      status: 'go',
-      message: 'ssp received data'
-  })
-  .then(response => {
-      console.log(' Success!', 'success');
-      console.log(' ' + response.data, 'Received Data from SSP');
-      console.log(' ' + response.data.status, 'received');
-  })
-  .catch(error => {
-      console.log(' Error: ' + error.error, 'error');
-  });
+function sendDatatoMockSSP(actionName, jsonData) {
+  if(window.AndroidBridge?.invokeLinkInterface){
+    let parsedData;
+    try {
+      parsedData = JSON.parse(jsonData);
+    } catch (e) {
+      console.error('Invalid JSON data:', e);
+      return;
+    }
+  // MiniApp.invokeLinkInterface(actionName, parsedData)
+    window.AndroidBridge.invokeLinkInterface(actionName, parsedData)
+      .then((response) => {
+        console.log(' SUCCESS from SSP:', response);
+      })
+      .catch((error) => {
+        console.error(' ERROR:', error);
+      });
+  }else{
+    console.error(`Error: window.AndroidBridge.invokeLinkInterface not found`)
+  }
 }
 
 const UriSchemes = () => {
@@ -120,6 +126,9 @@ const UriSchemes = () => {
   const [internalPostScopes, setInternalPostScopes] = useState('');
   // Add state for httpMethod
   const [internalPostMethod, setInternalPostMethod] = useState('POST');
+  // Add state for Mock SSP
+  const [mockSSPActionName, setMockSSPActionName] = useState('sendDatatoMockSSP');
+  const [mockSSPJsonData, setMockSSPJsonData] = useState('{}');
 
   //For LoadUsingHTMLString Interface
   const [loadHTMLStringCallbackUrl, setLoadHTMLStringCallbackUrl] = useState(
@@ -182,7 +191,7 @@ const UriSchemes = () => {
   function openInternalBrowser(url: string) {
     setTimeout(()=>{
       console.log('After 10 seconds calling sendDatatoMockSSP')
-      sendDatatoMockSSP();
+      sendDatatoMockSSP(mockSSPActionName, mockSSPJsonData);
     },10000)
     MiniApp.miniappUtils
       .launchInternalBrowser(url)
@@ -203,7 +212,7 @@ const UriSchemes = () => {
   ) {
     setTimeout(()=>{
       console.log('After 10 seconds calling sendDatatoMockSSP')
-      sendDatatoMockSSP();
+      sendDatatoMockSSP(mockSSPActionName, mockSSPJsonData);
     },10000)
     let httpBody;
     setInternalPostError('');
@@ -270,11 +279,37 @@ const UriSchemes = () => {
         <CardContent className={classes.content}>
           Send Data To Mock SSP
         </CardContent>
+        <CardContent className={deeplinkClass.content}>
+          <TextField
+            className={classes.textfield}
+            onChange={(e) => setMockSSPActionName(e.currentTarget.value)}
+            value={mockSSPActionName}
+            label="Action Name"
+            variant="outlined"
+            color="primary"
+            inputProps={{
+              'data-testid': 'mock-ssp-action-name-field',
+            }}
+          />
+        </CardContent>
+        <CardContent className={deeplinkClass.content}>
+          <TextField
+            className={classes.textfield}
+            onChange={(e) => setMockSSPJsonData(e.currentTarget.value)}
+            value={mockSSPJsonData}
+            label="JSON Data"
+            variant="outlined"
+            color="primary"
+            inputProps={{
+              'data-testid': 'mock-ssp-json-data-field',
+            }}
+          />
+        </CardContent>
         <CardActions className={deeplinkClass.actions}>
           <Button
             variant="contained"
             color="primary"
-            onClick={sendDatatoMockSSP}
+            onClick={() => sendDatatoMockSSP(mockSSPActionName, mockSSPJsonData)}
           >
             sendDatatoMockSSP
           </Button>
