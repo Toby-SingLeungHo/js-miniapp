@@ -122,7 +122,7 @@ interface MiniAppFeatures {
    */
   setCloseAlert(alertInfo: CloseAlertInfo): Promise<string>;
 
-  invokeLinkInterface(action: string, param: object | undefined)
+  invokeLinkInterface(action: string, param: object | undefined);
 }
 
 /**
@@ -313,7 +313,10 @@ export class MiniApp implements MiniAppFeatures, Ad, Platform {
     return getBridge().utilityManager.getPermissionStatus(name);
   }
 
-  invokeLinkInterface(name: string, param: object | undefined): Promise<string> {
+  invokeLinkInterface(
+    name: string,
+    param: object | undefined
+  ): Promise<string> {
     return getBridge().invokeLinkInterface(name, param);
   }
 }

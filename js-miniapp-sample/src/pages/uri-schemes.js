@@ -76,7 +76,7 @@ const deepLinkStyle = makeStyles((theme) => ({
 }));
 
 function sendDatatoMockSSP(actionName, jsonData) {
-  if(window.AndroidBridge?.invokeLinkInterface){
+  if (window.AndroidBridge?.invokeLinkInterface) {
     let parsedData;
     try {
       parsedData = JSON.parse(jsonData);
@@ -84,7 +84,7 @@ function sendDatatoMockSSP(actionName, jsonData) {
       console.error('Invalid JSON data:', e);
       return;
     }
-  // MiniApp.invokeLinkInterface(actionName, parsedData)
+    // MiniApp.invokeLinkInterface(actionName, parsedData)
     window.AndroidBridge.invokeLinkInterface(actionName, parsedData)
       .then((response) => {
         console.log(' SUCCESS from SSP:', response);
@@ -92,8 +92,8 @@ function sendDatatoMockSSP(actionName, jsonData) {
       .catch((error) => {
         console.error(' ERROR:', error);
       });
-  }else{
-    console.error(`Error: window.AndroidBridge.invokeLinkInterface not found`)
+  } else {
+    console.error(`Error: window.AndroidBridge.invokeLinkInterface not found`);
   }
 }
 
@@ -127,7 +127,8 @@ const UriSchemes = () => {
   // Add state for httpMethod
   const [internalPostMethod, setInternalPostMethod] = useState('POST');
   // Add state for Mock SSP
-  const [mockSSPActionName, setMockSSPActionName] = useState('sendDatatoMockSSP');
+  const [mockSSPActionName, setMockSSPActionName] =
+    useState('sendDatatoMockSSP');
   const [mockSSPJsonData, setMockSSPJsonData] = useState('{}');
 
   //For LoadUsingHTMLString Interface
@@ -189,10 +190,10 @@ const UriSchemes = () => {
   }
 
   function openInternalBrowser(url: string) {
-    setTimeout(()=>{
-      console.log('After 10 seconds calling sendDatatoMockSSP')
+    setTimeout(() => {
+      console.log('After 10 seconds calling sendDatatoMockSSP');
       sendDatatoMockSSP(mockSSPActionName, mockSSPJsonData);
-    },10000)
+    }, 10000);
     MiniApp.miniappUtils
       .launchInternalBrowser(url)
       .then((response) => {
@@ -210,10 +211,10 @@ const UriSchemes = () => {
     audience?: string,
     scopes?: string[]
   ) {
-    setTimeout(()=>{
-      console.log('After 10 seconds calling sendDatatoMockSSP')
+    setTimeout(() => {
+      console.log('After 10 seconds calling sendDatatoMockSSP');
       sendDatatoMockSSP(mockSSPActionName, mockSSPJsonData);
-    },10000)
+    }, 10000);
     let httpBody;
     setInternalPostError('');
     try {
@@ -309,7 +310,9 @@ const UriSchemes = () => {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => sendDatatoMockSSP(mockSSPActionName, mockSSPJsonData)}
+            onClick={() =>
+              sendDatatoMockSSP(mockSSPActionName, mockSSPJsonData)
+            }
           >
             sendDatatoMockSSP
           </Button>
