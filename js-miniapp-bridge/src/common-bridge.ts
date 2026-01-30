@@ -30,25 +30,30 @@ import { MiniAppError, parseMiniAppError } from './types/error-types';
 import { MiniAppResponseInfo } from './types/response-types/miniapp';
 import { ProductInfo, PurchasedProductInfo } from './types/in-app-purchase';
 import { HostThemeColor } from './types/host-color-scheme';
-import { MAAnalyticsInfo } from './types/analytics/analytics';
+import {
+  MAAnalyticsInfo,
+  MAAnalyticsConfig,
+} from './types/analytics/analytics';
 import { UniversalBridgeInfo } from './types/universal-bridge';
 import { CookieInfo } from './types/cookie-info';
-import { NotificationBridge } from './modules/notification-bridge';
 import {
   NotificationDetailedInfo,
   NotificationInfo,
   NotificationInfoType,
 } from './types/notification/notification-info';
+import { LogType } from './types/log-type';
+import { EsimConfig } from './types/e-sim';
+import { Platform } from './types/platform';
+import { LaunchBrowserOptions } from './types/browser-options';
+
+import { NotificationBridge } from './modules/notification-bridge';
 import { MiniAppPreferences } from './modules/miniapp-preferences';
 import { BrowserManager } from './modules/browser-manager';
 import { GalleryManager } from './modules/gallery-manager';
 import { UserProfileManager } from './modules/userprofile-manager';
 import { WebViewConfigManager } from './modules/webview-config-manager';
 import { UtilityManager } from './modules/utility-manager';
-import { LogType } from './types/log-type';
-import { EsimConfig } from './types/e-sim';
-import { Platform } from './types/platform';
-import { LaunchBrowserOptions } from './types/browser-options';
+import { OneClickSdk } from './modules/one-click-sdk';
 
 /** @internal */
 const mabMessageQueue: Callback[] = [];
@@ -105,6 +110,7 @@ export class MiniAppBridge {
   userProfileManager: UserProfileManager;
   webviewConfigManager: WebViewConfigManager;
   utilityManager: UtilityManager;
+  oneClickSdk: OneClickSdk;
 
   constructor(executor: PlatformExecutor) {
     this.executor = executor;
@@ -116,6 +122,7 @@ export class MiniAppBridge {
     this.userProfileManager = new UserProfileManager(executor);
     this.webviewConfigManager = new WebViewConfigManager(executor);
     this.utilityManager = new UtilityManager(executor);
+    this.oneClickSdk = new OneClickSdk(executor);
 
     if (window) {
       window.addEventListener(
@@ -879,6 +886,17 @@ export class MiniAppBridge {
       return this.executor.exec(
         'sendAnalytics',
         { analyticsInfo: analytics },
+        success => resolve(success),
+        error => reject(parseMiniAppError(error))
+      );
+    });
+  }
+
+  configureAnalytics(config: MAAnalyticsConfig) {
+    return new Promise<string>((resolve, reject) => {
+      return this.executor.exec(
+        'configureAnalytics',
+        config,
         success => resolve(success),
         error => reject(parseMiniAppError(error))
       );
