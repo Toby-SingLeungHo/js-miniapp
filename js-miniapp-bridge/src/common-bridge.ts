@@ -1181,11 +1181,14 @@ export class MiniAppBridge {
     return this.utilityManager.isAppInstalledInDevice(packageNameOrUrl);
   }
 
-  invokeLinkInterface(action:string, params:object | undefined): Promise<any> {
-    return new Promise<any>((resolve, reject) => {
+  invokeLinkInterface(
+    action: string,
+    params: object | undefined
+  ): Promise<string[]> {
+    return new Promise<string[]>((resolve, reject) => {
       return this.executor.exec(
         'invokeLinkInterface',
-        {action, params},
+        { action, params },
         response => {
           resolve(JSON.parse(response) as string[]);
         },

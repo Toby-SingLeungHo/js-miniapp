@@ -316,7 +316,7 @@ export class MiniApp implements MiniAppFeatures, Ad, Platform {
   invokeLinkInterface(
     name: string,
     param: object | undefined
-  ): Promise<string> {
+  ): Promise<string[]> {
     return getBridge().invokeLinkInterface(name, param);
   }
 }
