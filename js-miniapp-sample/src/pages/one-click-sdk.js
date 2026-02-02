@@ -1,4 +1,4 @@
-import React, { useState, useReducer } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 
 import {
   Button,
@@ -152,6 +152,10 @@ function OneClickSdk() {
   const [redirectUri, setRedirectUri] = useState('');
   const [supportedKycTypes, setSupportedKycTypes] = useState('');
   const [enabledSecurityCheck, setEnabledSecurityCheck] = useState(false);
+
+  useEffect(()=>{
+    window["startICChipKyc"] = startICChipKycFlow;
+  })
 
   function isTextFieldValuesValid(textFieldValue, fieldName) {
     if (isEmpty(textFieldValue)) {
