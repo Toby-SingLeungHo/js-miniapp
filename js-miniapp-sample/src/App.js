@@ -53,27 +53,19 @@ function App() {
     }
   }, []);
 
-  function startICChipKycFlow(){
-    const info = {
-      idid: 'example-idid',
-      minor: false,
-      redirectUri: 'https://example.com/redirect',
-      supportedKycTypes: 'IC_CHIP',
-      baseUrl: 'https://example.com/api',
-      enabledSecurityCheck: true
-    };
+  function startICChipKycFlow(params){
     try {
-      console.log('Starting IC Chip KYC with info:', info);
+      console.log('Exposed startICChipKycFlow:', params);
       MiniApp.oneClickSdk
-        .startICChipKyc(info)
+        .startICChipKyc(params)
         .then((response) => {
-          console.log('IC Chip KYC started successfully:', response);
+          console.log('Exposed startICChipKycFlow success:', response);
         })
         .catch((error) => {
-          console.error('Error starting IC Chip KYC:', error);
+          console.error('Exposed startICChipKycFlow error:', error);
         });
     } catch (error) {
-      console.error('An error occurred while starting IC Chip KYC:', error);
+      console.error('Try-Catch Exception in Exposed startICChipKycFlow:', error);
     }
   }
 
