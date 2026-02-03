@@ -46,10 +46,36 @@ function App() {
           updateLoadingStatus();
         };
       }
+
+      window["startICChipKyc"] = startICChipKycFlow;
     } catch (e) {
       console.log(e);
     }
   }, []);
+
+  function startICChipKycFlow(){
+    const info = {
+      idid: 'example-idid',
+      minor: false,
+      redirectUri: 'https://example.com/redirect',
+      supportedKycTypes: 'IC_CHIP',
+      baseUrl: 'https://example.com/api',
+      enabledSecurityCheck: true
+    };
+    try {
+      console.log('Starting IC Chip KYC with info:', info);
+      MiniApp.oneClickSdk
+        .startICChipKyc(info)
+        .then((response) => {
+          console.log('IC Chip KYC started successfully:', response);
+        })
+        .catch((error) => {
+          console.error('Error starting IC Chip KYC:', error);
+        });
+    } catch (error) {
+      console.error('An error occurred while starting IC Chip KYC:', error);
+    }
+  }
 
   function miniAppDidFinishLoad() {
     try {

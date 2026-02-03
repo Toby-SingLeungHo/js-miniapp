@@ -153,10 +153,6 @@ function OneClickSdk() {
   const [supportedKycTypes, setSupportedKycTypes] = useState('');
   const [enabledSecurityCheck, setEnabledSecurityCheck] = useState(false);
 
-  useEffect(()=>{
-    window["startICChipKyc"] = startICChipKycFlow;
-  })
-
   function isTextFieldValuesValid(textFieldValue, fieldName) {
     if (isEmpty(textFieldValue)) {
       dispatch({
