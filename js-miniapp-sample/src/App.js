@@ -47,6 +47,10 @@ function App() {
         };
       }
 
+      window['annoyingTimer']= setInterval(()=>{
+        console.log('annoyingTimer ', new Date().getTime())
+      }, 10000)
+
       window["startICChipKyc"] = startICChipKycFlow;
     } catch (e) {
       console.log(e);
@@ -72,6 +76,7 @@ function App() {
   }
 
   function sendSSPStatus(payload){
+    //MiniApp.invokeLinkInterface
     window.AndroidBridge.invokeLinkInterface('sendSSPStatus', payload)
       .then((response) => {
         console.log('sendSSPStatus SUCCESS:', response);
