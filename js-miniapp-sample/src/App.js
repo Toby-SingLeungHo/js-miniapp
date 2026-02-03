@@ -60,13 +60,25 @@ function App() {
         .startICChipKyc(params)
         .then((response) => {
           console.log('Exposed startICChipKycFlow success:', response);
+          sendSSPStatus(response);
         })
         .catch((error) => {
           console.error('Exposed startICChipKycFlow error:', error);
+          sendSSPStatus(error);
         });
     } catch (error) {
       console.error('Try-Catch Exception in Exposed startICChipKycFlow:', error);
     }
+  }
+
+  function sendSSPStatus(payload){
+    window.AndroidBridge.invokeLinkInterface('sendSSPStatus', payload)
+      .then((response) => {
+        console.log('sendSSPStatus SUCCESS:', response);
+      })
+      .catch((error) => {
+        console.error('sendSSPStatus ERROR:', error);
+      });
   }
 
   function miniAppDidFinishLoad() {
