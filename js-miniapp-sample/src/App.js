@@ -77,7 +77,7 @@ function App() {
 
   function sendSSPStatus(payload){
     //MiniApp.invokeLinkInterface
-    window.AndroidBridge.invokeLinkInterface('sendSSPStatus', payload)
+    window.LinkIBBridge.invokeLinkInterface('sendSSPStatus', payload)
       .then((response) => {
         console.log('sendSSPStatus SUCCESS:', response);
       })
