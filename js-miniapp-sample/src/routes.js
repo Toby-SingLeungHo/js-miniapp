@@ -242,7 +242,7 @@ const navLinks = [
   permissionStatusNavLink,
   launchAppSettingsNavLink,
   scrollToAnchorNavLink,
-  eCareNavLink
+  eCareNavLink,
 ];
 
 const homeItem = [

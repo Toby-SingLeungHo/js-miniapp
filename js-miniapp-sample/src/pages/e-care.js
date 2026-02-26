@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
     height: 'auto',
     left: '50%',
     position: 'relative',
-    transform: 'translate(-50%, 0)'
+    transform: 'translate(-50%, 0)',
   },
   actions: {
     justifyContent: 'center',
@@ -71,18 +71,18 @@ const ECare = () => {
   const [closeStatus, setCloseStatus] = useState('');
 
   const sendInfoToHostApp = () => {
-    if (sendInfoType && sendInfoType.length>0) {
+    if (sendInfoType && sendInfoType.length > 0) {
       setSendInfoStatus('Navigation Type cannot be empty');
       return;
     }
-    if (sendInfoName && sendInfoName.length>0) {
+    if (sendInfoName && sendInfoName.length > 0) {
       setSendInfoStatus('Screen Name cannot be empty');
       return;
     }
     const info = {
-      "key": sendInfoType, // Must Label: Navigation Type
-      "value": sendInfoName, // Must Label: Screen name
-      "description": "information to be logged", // Must
+      key: sendInfoType, // Must Label: Navigation Type
+      value: sendInfoName, // Must Label: Screen name
+      description: 'information to be logged', // Must
     };
     MiniApp.universalBridge
       .sendInfoToHostapp(info)
@@ -90,7 +90,9 @@ const ECare = () => {
         setSendInfoStatus('SUCCESS');
       })
       .catch((err) => {
-        setSendInfoStatus(err && err.message ? err.message : 'Failed to send info');
+        setSendInfoStatus(
+          err && err.message ? err.message : 'Failed to send info'
+        );
       });
   };
 
@@ -120,7 +122,9 @@ const ECare = () => {
         setCloseStatus('SUCCESS');
       })
       .catch((err) => {
-        setCloseStatus(err && err.message ? err.message : 'Failed to close MiniApp');
+        setCloseStatus(
+          err && err.message ? err.message : 'Failed to close MiniApp'
+        );
       });
   };
 
