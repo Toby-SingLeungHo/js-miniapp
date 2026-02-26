@@ -31,6 +31,7 @@ import Inventory2Icon from '@mui/icons-material/Inventory2';
 import LoginIcon from '@mui/icons-material/Login';
 import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
 import TouchAppIcon from '@mui/icons-material/TouchAppOutlined';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 import Ads from './pages/ads';
 import Analytics from './pages/analytics';
@@ -68,6 +69,7 @@ import WebLocation from './pages/web-location';
 import WebViewConfig from './pages/web-view-config';
 import WindowActions from './pages/window-actions';
 import OneClickSdk from './pages/one-click-sdk';
+import ECare from './pages/e-care';
 
 //default root location when using ios
 const iosHomeNavLink = { navLink: '/index.html', label: 'Home' };
@@ -196,6 +198,11 @@ const oneClickNavLink = {
   label: 'OneClick',
 };
 
+const eCareNavLink = {
+  navLink: '/ecare',
+  label: 'eCare',
+};
+
 const navLinks = [
   iosHomeNavLink,
   androidHomeNavLink,
@@ -235,6 +242,7 @@ const navLinks = [
   permissionStatusNavLink,
   launchAppSettingsNavLink,
   scrollToAnchorNavLink,
+  eCareNavLink
 ];
 
 const homeItem = [
@@ -456,6 +464,12 @@ const appItems = [
     label: oneClickNavLink.label,
     navLink: oneClickNavLink.navLink,
     element: <OneClickSdk />,
+  },
+  {
+    icon: <AccountCircleIcon />,
+    label: eCareNavLink.label,
+    navLink: eCareNavLink.navLink,
+    element: <ECare />,
   },
 ];
 

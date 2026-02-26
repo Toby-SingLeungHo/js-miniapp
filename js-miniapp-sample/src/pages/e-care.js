@@ -14,15 +14,16 @@ import GreyCard from '../components/GreyCard';
 const useStyles = makeStyles((theme) => ({
   scrollable: {
     overflowY: 'auto',
-    width: 'auto',
+    width: '100%',
     paddingTop: 20,
     paddingBottom: 20,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   card: {
-    maxWidth: '500px',
-    width: 'auto',
     height: 'auto',
+    left: '50%',
+    position: 'relative',
+    transform: 'translate(-50%, 0)'
   },
   actions: {
     justifyContent: 'center',
@@ -55,9 +56,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const HostAppActions = () => {
+const ECare = () => {
   const classes = useStyles();
 
+  const [sendInfoType, setSendInfoType] = useState('');
+  const [sendInfoName, setSendInfoName] = useState('');
   const [sendInfoStatus, setSendInfoStatus] = useState('');
 
   // launchAppUsingDeeplink state
@@ -68,9 +71,17 @@ const HostAppActions = () => {
   const [closeStatus, setCloseStatus] = useState('');
 
   const sendInfoToHostApp = () => {
+    if (sendInfoType && sendInfoType.length>0) {
+      setSendInfoStatus('Navigation Type cannot be empty');
+      return;
+    }
+    if (sendInfoName && sendInfoName.length>0) {
+      setSendInfoStatus('Screen Name cannot be empty');
+      return;
+    }
     const info = {
-      "key": "navigate", // Must
-      "value": "OPEN_LINK_ACTIVATION_SCREEN", // Must
+      "key": sendInfoType, // Must Label: Navigation Type
+      "value": sendInfoName, // Must Label: Screen name
       "description": "information to be logged", // Must
     };
     MiniApp.universalBridge
@@ -118,13 +129,33 @@ const HostAppActions = () => {
       <h1>eCare MiniApp SLA</h1>
       {/* Send Info to Host App Card */}
       <GreyCard className={classes.card}>
+        <CardContent className={classes.content}>
+          <TextField
+            variant="outlined"
+            className={classes.formInput}
+            id="navigation-type"
+            label="Navigation Type"
+            value={sendInfoType}
+            onChange={(e) => setSendInfoType(e.target.value)}
+          />
+        </CardContent>
+        <CardContent className={classes.content}>
+          <TextField
+            variant="outlined"
+            className={classes.formInput}
+            id="screen-name"
+            label="Screen Name"
+            value={sendInfoName}
+            onChange={(e) => setSendInfoName(e.target.value)}
+          />
+        </CardContent>
         <CardActions className={classes.actions}>
           <Button
             color="primary"
             variant="contained"
             onClick={sendInfoToHostApp}
           >
-            Open OTP Screen
+            Open Screen
           </Button>
         </CardActions>
         {sendInfoStatus !== '' && (
@@ -213,4 +244,4 @@ const HostAppActions = () => {
   );
 };
 
-export default HostAppActions;
+export default ECare;
