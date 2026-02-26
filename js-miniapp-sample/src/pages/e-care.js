@@ -71,11 +71,11 @@ const ECare = () => {
   const [closeStatus, setCloseStatus] = useState('');
 
   const sendInfoToHostApp = () => {
-    if (sendInfoType && sendInfoType.length > 0) {
+    if (sendInfoType && sendInfoType.length == 0) {
       setSendInfoStatus('Navigation Type cannot be empty');
       return;
     }
-    if (sendInfoName && sendInfoName.length > 0) {
+    if (sendInfoName && sendInfoName.length == 0) {
       setSendInfoStatus('Screen Name cannot be empty');
       return;
     }
