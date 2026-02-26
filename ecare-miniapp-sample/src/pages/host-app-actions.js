@@ -20,7 +20,8 @@ const useStyles = makeStyles((theme) => ({
     textAlign: 'center'
   },
   card: {
-    width: '500px',
+    maxWidth: '500px',
+    width: 'auto',
     height: 'auto',
   },
   actions: {
@@ -57,10 +58,6 @@ const useStyles = makeStyles((theme) => ({
 const HostAppActions = () => {
   const classes = useStyles();
 
-  // sendInfoToHostApp state
-  const [infoKey, setInfoKey] = useState('');
-  const [infoValue, setInfoValue] = useState('');
-  const [infoDescription, setInfoDescription] = useState('');
   const [sendInfoStatus, setSendInfoStatus] = useState('');
 
   // launchAppUsingDeeplink state
@@ -71,11 +68,6 @@ const HostAppActions = () => {
   const [closeStatus, setCloseStatus] = useState('');
 
   const sendInfoToHostApp = () => {
-    setSendInfoStatus('');
-    if (!infoKey) {
-      setSendInfoStatus('Key cannot be empty');
-      return;
-    }
     const info = {
       "key": "navigate", // Must
       "value": "OPEN_LINK_ACTIVATION_SCREEN", // Must
