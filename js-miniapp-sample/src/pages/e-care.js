@@ -59,7 +59,11 @@ const useStyles = makeStyles((theme) => ({
 const ECare = () => {
   const classes = useStyles();
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedInStatus, setIsLoggedInStatus] = useState('');
+
   const [sendInfoType, setSendInfoType] = useState('');
+
   const [sendInfoName, setSendInfoName] = useState('');
   const [sendInfoStatus, setSendInfoStatus] = useState('');
 
@@ -69,6 +73,34 @@ const ECare = () => {
 
   // closeMiniApp state
   const [closeStatus, setCloseStatus] = useState('');
+
+  const checkIsLoggedIn = () => {
+    setIsLoggedInStatus('');
+    try {
+      MiniApp.user
+        .isLoggedIn()
+        .then((response) => {
+          setIsLoggedIn(response ? true : false);
+        })
+        .catch((miniAppError) => {
+          console.log('isLoggedIn - Error: ', miniAppError);
+        })
+        .finally(() => {
+          setTimeout(() => {
+            setIsLoggedInStatus(
+              isLoggedIn ? 'User is Logged In' : 'User is not Logged In'
+            );
+          }, 500);
+        });
+    } catch (e) {
+      console.error(e);
+      setTimeout(() => {
+        setIsLoggedInStatus(
+          isLoggedIn ? 'User is Logged In' : 'User is not Logged In'
+        );
+      }, 500);
+    }
+  };
 
   const sendInfoToHostApp = () => {
     setSendInfoStatus('');
@@ -137,6 +169,13 @@ const ECare = () => {
   return (
     <div className={classes.scrollable}>
       <h1>eCare MiniApp SLA</h1>
+      <CardContent className={isLoggedIn ? classes.success : classes.error}>
+        {isLoggedInStatus}&nbsp;&nbsp;
+        <Button variant="outlined" onClick={checkIsLoggedIn}>
+          Check Login Status
+        </Button>
+      </CardContent>
+
       {/* Send Info to Host App Card */}
       <GreyCard className={classes.card}>
         <CardContent className={classes.content}>
