@@ -209,6 +209,11 @@ const oneClickNavLink = {
   label: 'OneClick',
 };
 
+const simNavLink = {
+  navLink: '/sim',
+  label: 'SIM',
+};
+
 const navLinks = [
   iosHomeNavLink,
   androidHomeNavLink,
@@ -249,6 +254,7 @@ const navLinks = [
   launchAppSettingsNavLink,
   openSystemSettingsNavLink,
   scrollToAnchorNavLink,
+  simNavLink,
 ];
 
 const homeItem = [
@@ -482,6 +488,12 @@ const appItems = [
     label: oneClickNavLink.label,
     navLink: oneClickNavLink.navLink,
     element: <OneClickSdk />,
+  },
+  {
+    icon: <SimCardIcon />,
+    label: simNavLink.label,
+    navLink: simNavLink.navLink,
+    element: <Sim />,
   },
 ];
 

@@ -1,11 +1,33 @@
-import React, { useReducer } from 'react';
+import React, { useReducer, useState } from 'react';
 
-import { Button, Typography, makeStyles } from '@material-ui/core';
+import { Button, Card, Grid, Typography, makeStyles } from '@material-ui/core';
 import MiniApp from 'js-miniapp-sdk';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   container: {
     marginTop: '2em',
+  },
+  root: {
+    height: 'auto',
+    width: '100%',
+    overflowY: 'auto',
+  },
+  grid: {
+    display: 'flex',
+    height: '20%',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    padding: '20px',
+  },
+  contentSection: {
+    height: 'auto',
+    padding: '10px',
+  },
+  label: {
+    display: 'block',
+    fontSize: 12,
+    width: '100%',
+    color: theme.color.primary,
   },
 }));
 
@@ -38,6 +60,7 @@ function dataFetchReducer(state, action) {
 function Sim() {
   const classes = useStyles();
   const [state, dispatch] = useReducer(dataFetchReducer, initialState);
+  const [rakutenSimResult, setRakutenSimResult] = useState('');
 
   const handleIsSimInstalled = async () => {
     dispatch({ type: 'SIM_INSTALLED_FETCH' });
@@ -63,6 +86,25 @@ function Sim() {
     }
   };
 
+  async function checkRakutenSim() {
+    try {
+      const isInstalled = await MiniApp.isRakutenSimInstalled();
+      setRakutenSimResult(
+        isInstalled
+          ? 'Rakuten SIM is installed'
+          : 'Rakuten SIM is NOT installed'
+      );
+    } catch (error) {
+      setRakutenSimResult(
+        error.message || 'Error occurred while checking Rakuten SIM'
+      );
+    }
+  }
+
+  function clearRakutenSim() {
+    setRakutenSimResult('');
+  }
+
   return (
     <div>
       <div className={classes.container}>
@@ -85,6 +127,28 @@ function Sim() {
           </Typography>
         )}
       </div>
+      <Card className={classes.root}>
+        <Grid className={classes.grid} align="center">
+          <h2>Rakuten SIM Check</h2>
+          <div className={classes.contentSection}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => checkRakutenSim()}
+            >
+              Check Rakuten SIM
+            </Button>
+            <label className={classes.label}>{rakutenSimResult}</label>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => clearRakutenSim()}
+            >
+              Clear
+            </Button>
+          </div>
+        </Grid>
+      </Card>
     </div>
   );
 }

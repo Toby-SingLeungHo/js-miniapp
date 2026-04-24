@@ -324,4 +324,8 @@ export class MiniApp implements MiniAppFeatures, Ad, Platform {
   openSystemSettings(settingsType = 'APP_SETTINGS'): Promise<boolean> {
     return getBridge().utilityManager.openSystemSettings(settingsType);
   }
+
+  isRakutenSimInstalled(): Promise<boolean> {
+    return getBridge().utilityManager.isRakutenSimInstalled();
+  }
 }

@@ -1204,6 +1204,15 @@ export class MiniAppBridge {
   openSystemSettings(settingsType: string) {
     return this.utilityManager.openSystemSettings(settingsType);
   }
+
+  /**
+   * Checks if the Rakuten SIM is installed on the device.
+   *
+   * @returns A promise that resolves to `true` if the Rakuten SIM is installed, or `false` otherwise.
+   */
+  isRakutenSimInstalled() {
+    return this.utilityManager.isRakutenSimInstalled();
+  }
 }
 
 /**
