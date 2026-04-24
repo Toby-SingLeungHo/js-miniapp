@@ -2,6 +2,7 @@
 
 ### 1.28.0 (TBD)
 - **Feature:** Added new interface `isSimInstalled` to check if a SIM card is installed on the device.
+- **Feature:** Added new interface `openSystemSettings` to request the host app to open a specific system settings screen. Accepts an optional `settingsType` string parameter (default: `APP_SETTINGS`).
 
 ### 1.27.0 (2026-03-18)
 - **Feature:** Added new interface `startICChipKyc` to request Host App to start IC Chip flow.
