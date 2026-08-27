@@ -1,6 +1,7 @@
 ## CHANGELOG
 
-### 1.29.0 (2026-08-19)
+### 1.29.0 (2026-08-27)
+- **Sample:** Added Typography sample page to demonstrate rendering with Rakuten and General fonts, HTML element styles, and font-weight controls.
 - **Feature:** Added new interface `getNetworkStatus` to retrieve the current network connectivity status, returning a `NetworkStatus` object with `isConnected` (boolean) and `networkType` (`NetworkType` enum: `WIFI_OR_ETHERNET`, `CELLULAR`, `SATELLITE`, `NO_CONNECTION`).
 - **Feature:** Added new event interface `onNetworkStatusChanged` to subscribe to network connectivity changes. The callback receives a `NetworkStatus` object whenever the network state changes. Use `getNetworkStatus()` to get the initial state on load.
 

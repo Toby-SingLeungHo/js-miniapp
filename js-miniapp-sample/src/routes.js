@@ -33,6 +33,7 @@ import Inventory2Icon from '@mui/icons-material/Inventory2';
 import LoginIcon from '@mui/icons-material/Login';
 import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
 import TouchAppIcon from '@mui/icons-material/TouchAppOutlined';
+import TextFieldsIcon from '@mui/icons-material/TextFields';
 
 import Ads from './pages/ads';
 import Analytics from './pages/analytics';
@@ -71,6 +72,7 @@ import WebViewConfig from './pages/web-view-config';
 import WindowActions from './pages/window-actions';
 import OneClickSdk from './pages/one-click-sdk';
 import SimStatus from './pages/sim';
+import TypographyPage from './pages/typography';
 import NetworkStatusComponent from './pages/network-status';
 
 //default root location when using ios
@@ -205,6 +207,11 @@ const oneClickNavLink = {
   label: 'OneClick',
 };
 
+const typographyNavLink = {
+  navLink: '/typography',
+  label: 'Typography',
+};
+
 const networkStatusNavLink = {
   navLink: '/network-status',
   label: 'Network Status',
@@ -250,6 +257,7 @@ const navLinks = [
   launchAppSettingsNavLink,
   scrollToAnchorNavLink,
   simNavLink,
+  typographyNavLink,
   networkStatusNavLink,
 ];
 
@@ -478,6 +486,12 @@ const appItems = [
     label: oneClickNavLink.label,
     navLink: oneClickNavLink.navLink,
     element: <OneClickSdk />,
+  },
+  {
+    icon: <TextFieldsIcon />,
+    label: typographyNavLink.label,
+    navLink: typographyNavLink.navLink,
+    element: <TypographyPage />,
   },
   {
     icon: <NetworkCheckIcon />,
